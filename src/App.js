@@ -44,13 +44,14 @@ function App() {
         Authorization: `Bearer ${token}`
       },
     })
-    console.log(data)
     setUserName(data.display_name)
     setUserId(data.id)
     setUserImage(data.images[0].url)
     setUserCountry(data.country)
   }
-
+  useEffect(() => {
+    getUserInfo();
+  });
   return (
     <div className="App">
       <header className="App-header">
@@ -59,7 +60,6 @@ function App() {
         ? <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}`}><button>Login to Spotify</button></a>
         : <>
         <button onClick={logout}>Logout</button>
-        <button onClick={getUserInfo}>Get User Info</button>
         <p>{userName}</p>
         <p>{userCountry}</p>
         <img src={userImage} height="100px" width="100px" />
