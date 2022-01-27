@@ -1,13 +1,14 @@
 import './App.css';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { render } from '@testing-library/react';
 
 function App() {
   const CLIENT_ID = "79c421b52b86490ba713837ace00cf97"
   const REDIRECT_URI = "http://localhost:3000"
   const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize"
   const RESPONSE_TYPE = "token"
-  const SCOPE = "user-read-private"
+  const SCOPE = "user-read-private user-top-read"
   const [token, setToken] = useState("")
 
   useEffect(() => {
@@ -49,9 +50,23 @@ function App() {
     setUserImage(data.images[0].url)
     setUserCountry(data.country)
   }
+
   useEffect(() => {
     getUserInfo();
   });
+
+  const getUserTopTracks = async () => {
+    if(!token) {
+      return
+    }
+    const {data} = await axios.get("https://api.spotify.com/v1/me/top/tracks", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+    })
+    let userTopTracks = data.items.map(i => (i.name))
+    console.log(userTopTracks)
+  }
   return (
     <div className="App">
       <header className="App-header">
@@ -63,6 +78,7 @@ function App() {
         <p>{userName}</p>
         <p>{userCountry}</p>
         <img src={userImage} height="100px" width="100px" />
+        <button onClick={getUserTopTracks}>Get Top Tracks</button>
         </>
         }
       </header>
