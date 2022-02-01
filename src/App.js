@@ -1,9 +1,11 @@
 import './App.css';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { createUseStyles } from 'react-jss';
 import { render } from '@testing-library/react';
 
 function App() {
+  // Variables for the API Query, required for getting required access for the app
   const CLIENT_ID = "79c421b52b86490ba713837ace00cf97"
   const REDIRECT_URI = "http://localhost:3000"
   const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize"
@@ -25,17 +27,25 @@ function App() {
     setToken(token)
   }, [])
 
+  // Logout function, sets token to nil and reloads
   const logout = () => {
     setToken("")
     window.localStorage.removeItem("token")
     window.location.reload()
   }
 
+  // Preparing variables for getUserInfo
   const [userName, setUserName] = useState("")
-  const [userId, setUserId] = useState("")
   const [userImage, setUserImage] = useState("")
   const [userCountry, setUserCountry] = useState("")
+
+  if(userName && userImage && userCountry) {
+    console.log('Logged In')
+  } else {
+    console.log('Logged Out')
+  }
   
+  // Gets user information from the Spotify API
   const getUserInfo = async () => {
     if(!token) {
       return
@@ -46,15 +56,19 @@ function App() {
       },
     })
     setUserName(data.display_name)
-    setUserId(data.id)
     setUserImage(data.images[0].url)
     setUserCountry(data.country)
   }
 
+  // Gets the user info everytime the page is loaded
   useEffect(() => {
     getUserInfo();
   });
 
+  // Load style sheet
+  const classes = useStyles();
+
+  // This function retrieves the users top tracks from the Spotify API
   const getUserTopTracks = async () => {
     if(!token) {
       return
@@ -64,9 +78,20 @@ function App() {
         Authorization: `Bearer ${token}`
       },
     })
-    let userTopTracks = data.items.map(i => (i.name))
+    //console.log(data.items[0])
+    let userTopTracks = data.items
     console.log(userTopTracks)
   }
+
+  // This function renders the top tracks as a JSX element, in a grid array
+  const RenderUserTopTracks = () => {
+    return (
+      <div className={classes.topTrackBox}>
+        <p>Sugma</p>
+      </div>
+    )
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -79,11 +104,18 @@ function App() {
         <p>{userCountry}</p>
         <img src={userImage} height="100px" width="100px" />
         <button onClick={getUserTopTracks}>Get Top Tracks</button>
+        <RenderUserTopTracks />
         </>
         }
       </header>
     </div>
   );
 }
+
+const useStyles = createUseStyles({
+  topTrackBox: {
+    backgroundColor: 'black',
+  },
+});
 
 export default App;
