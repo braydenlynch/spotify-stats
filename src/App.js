@@ -73,7 +73,7 @@ function App() {
     if(!token) {
       return
     }
-    const {data} = await axios.get("https://api.spotify.com/v1/me/top/tracks", {
+    const {data} = await axios.get("https://api.spotify.com/v1/me/top/tracks?limit=50&offset=49&time_range=long_term", {
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -81,6 +81,9 @@ function App() {
     //console.log(data.items[0])
     let userTopTracks = data.items
     console.log(userTopTracks)
+    for (var i = 0; i < 49; i++) {
+      console.log(userTopTracks[i].name, userTopTracks[i].artists)
+    }
   }
 
   // This function renders the top tracks as a JSX element, in a grid array
